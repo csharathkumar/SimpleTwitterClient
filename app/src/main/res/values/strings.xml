@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Twitter Timeline</string>
+    <string name="login_label">Connect to Twitter</string>
+    <string name="title_activity_timeline">Home</string>
+    <string name="compose">Compose</string>
+    <string name="title_activity_compose">@string/compose</string>
+    <string name="tweet">Tweet</string>
+    <string name="title_activity_media">MediaActivity</string>
+    <string name="image">Photo</string>
+    <string name="video">Video</string>
+    <string name="favorite_unsuccessful">Favorite unsuccessful</string>
+    <string name="retweeted">Retweeted</string>
+    <string name="retweet_unsuccessful">Retweet unsuccessful</string>
+    <string name="replied_successfully">Replied Successfully</string>
+    <string name="favorited">Favorited</string>
+    <string name="favorite_successful">Favorite unsuccessful</string>
+    <string name="check_tweet_length">Please check the length of the tweet</string>
+
+</resources>

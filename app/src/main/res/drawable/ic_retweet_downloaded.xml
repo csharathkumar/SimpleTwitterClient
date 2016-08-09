@@ -1,0 +1,8 @@
+<vector android:height="20dp"
+    android:viewportHeight="100.0"
+    android:viewportWidth="100.0"
+    android:width="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/twitter_actions_color"
+        android:pathData="M23.1,76.5c-1.85,0 -3.36,-1.51 -3.36,-3.37V45.66L5,45.66l20.03,-21.92l20.04,21.93H30.31v20.24h15.85L56.54,76.5H23.1zM95,54.34H80.25V26.87c0,-1.86 -1.51,-3.37 -3.36,-3.37H43.46L53.84,34.1h15.85v20.24l-14.75,0.01l20.03,21.93L95,54.34z"/>
+</vector>
