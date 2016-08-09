@@ -26,7 +26,8 @@ public class Tweet implements Parcelable {
     private long favoritesCount;
     private boolean retweeted;
     private String inReplyToUserName;
-
+    private boolean isRetweet;
+    private String retweetUserName;
 
     public String getBody() {
         return body;
@@ -116,16 +117,46 @@ public class Tweet implements Parcelable {
         this.inReplyToUserName = inReplyToUserName;
     }
 
+    public boolean isRetweet() {
+        return isRetweet;
+    }
+
+    public void setRetweet(boolean retweet) {
+        isRetweet = retweet;
+    }
+
+    public String getRetweetUserName() {
+        return retweetUserName;
+    }
+
+    public void setRetweetUserName(String retweetUserName) {
+        this.retweetUserName = retweetUserName;
+    }
+
     public static Tweet fromJSON(JSONObject jsonObject){
         Tweet tweet = new Tweet();
         try {
-            tweet.body = jsonObject.getString("text");
-            tweet.uid = jsonObject.getLong("id");
             tweet.createdAt = jsonObject.getString("created_at");
-            tweet.favorited = jsonObject.getBoolean("favorited");
-            tweet.user = User.fromJSONObject(jsonObject.getJSONObject("user"));
             tweet.favoritesCount = jsonObject.getLong("favorite_count");
             tweet.retweetCount = jsonObject.getLong("retweet_count");
+            tweet.favorited = jsonObject.getBoolean("favorited");
+            tweet.retweeted = jsonObject.getBoolean("retweeted");
+
+
+
+            if(jsonObject.has("retweeted_status")){
+                tweet.uid = jsonObject.getJSONObject("retweeted_status").getLong("id");
+                tweet.body = jsonObject.getJSONObject("retweeted_status").getString("text");
+                tweet.user = User.fromJSONObject(jsonObject.getJSONObject("retweeted_status").getJSONObject("user"));
+                tweet.retweetUserName = jsonObject.getJSONObject("user").getString("name");
+                tweet.isRetweet = true;
+            }else{
+                tweet.body = jsonObject.getString("text");
+                tweet.uid = jsonObject.getLong("id");
+                tweet.user = User.fromJSONObject(jsonObject.getJSONObject("user"));
+                tweet.isRetweet = false;
+                tweet.retweetUserName = null;
+            }
             JSONObject entities = jsonObject.getJSONObject("entities");
             if(entities.has("media")){
                 JSONArray mediaArray = entities.getJSONArray("media");
@@ -142,9 +173,7 @@ public class Tweet implements Parcelable {
                     }
                 }
             }
-            if(jsonObject.has("retweeted") && !jsonObject.isNull("retweeted")){
-                tweet.retweeted = jsonObject.getBoolean("retweeted");
-            }
+
             if(jsonObject.has("in_reply_to_screen_name") && !jsonObject.isNull("in_reply_to_screen_name")){
                 tweet.inReplyToUserName = jsonObject.getString("in_reply_to_screen_name");
             }
@@ -190,6 +219,8 @@ public class Tweet implements Parcelable {
         dest.writeParcelable(this.extendedMedia,flags);
         dest.writeString(String.valueOf(this.retweeted));
         dest.writeString(this.inReplyToUserName);
+        dest.writeString(String.valueOf(isRetweet));
+        dest.writeString(retweetUserName);
     }
 
     public Tweet() {
@@ -207,6 +238,8 @@ public class Tweet implements Parcelable {
         this.extendedMedia = in.readParcelable(Media.class.getClassLoader());
         this.retweeted = Boolean.parseBoolean(in.readString());
         this.inReplyToUserName = in.readString();
+        this.isRetweet = Boolean.parseBoolean(in.readString());
+        this.retweetUserName = in.readString();
     }
 
     public static final Creator<Tweet> CREATOR = new Creator<Tweet>() {

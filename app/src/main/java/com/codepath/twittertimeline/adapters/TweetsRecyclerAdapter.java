@@ -90,8 +90,12 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         }else{
             holder.tvRetweetCount.setVisibility(View.GONE);
         }
-        if(tweet.isRetweeted()){
-            holder.tvRetweetReplyInfo.setText("You Retweeted");
+        if(tweet.isRetweet()){
+            if(tweet.isRetweeted()){
+                holder.tvRetweetReplyInfo.setText("You Retweeted");
+            }else{
+                holder.tvRetweetReplyInfo.setText(tweet.getRetweetUserName()+" Retweeted");
+            }
             holder.tvRetweetReplyInfo.setVisibility(View.VISIBLE);
             holder.ivRetweet.setImageResource(R.drawable.ic_retweeted);
         }else{
