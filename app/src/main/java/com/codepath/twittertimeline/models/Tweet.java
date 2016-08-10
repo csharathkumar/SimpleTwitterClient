@@ -137,7 +137,6 @@ public class Tweet implements Parcelable {
         Tweet tweet = new Tweet();
         try {
             tweet.createdAt = jsonObject.getString("created_at");
-            tweet.favoritesCount = jsonObject.getLong("favorite_count");
             tweet.retweetCount = jsonObject.getLong("retweet_count");
             tweet.favorited = jsonObject.getBoolean("favorited");
             tweet.retweeted = jsonObject.getBoolean("retweeted");
@@ -147,6 +146,7 @@ public class Tweet implements Parcelable {
             if(jsonObject.has("retweeted_status")){
                 tweet.uid = jsonObject.getJSONObject("retweeted_status").getLong("id");
                 tweet.body = jsonObject.getJSONObject("retweeted_status").getString("text");
+                tweet.favoritesCount = jsonObject.getJSONObject("retweeted_status").getLong("favorite_count");
                 tweet.user = User.fromJSONObject(jsonObject.getJSONObject("retweeted_status").getJSONObject("user"));
                 tweet.retweetUserName = jsonObject.getJSONObject("user").getString("name");
                 tweet.isRetweet = true;
@@ -154,6 +154,7 @@ public class Tweet implements Parcelable {
                 tweet.body = jsonObject.getString("text");
                 tweet.uid = jsonObject.getLong("id");
                 tweet.user = User.fromJSONObject(jsonObject.getJSONObject("user"));
+                tweet.favoritesCount = jsonObject.getLong("favorite_count");
                 tweet.isRetweet = false;
                 tweet.retweetUserName = null;
             }

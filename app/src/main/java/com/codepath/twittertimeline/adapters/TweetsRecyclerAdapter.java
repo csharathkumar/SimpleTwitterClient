@@ -93,21 +93,22 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         if(tweet.isRetweet()){
             if(tweet.isRetweeted()){
                 holder.tvRetweetReplyInfo.setText("You Retweeted");
+                holder.ivRetweet.setImageResource(R.drawable.ic_retweeted);
             }else{
                 holder.tvRetweetReplyInfo.setText(tweet.getRetweetUserName()+" Retweeted");
+                holder.ivRetweet.setImageResource(R.drawable.ic_retweet_downloaded);
             }
             holder.tvRetweetReplyInfo.setVisibility(View.VISIBLE);
-            holder.ivRetweet.setImageResource(R.drawable.ic_retweeted);
         }else{
             holder.tvRetweetReplyInfo.setVisibility(View.GONE);
             holder.ivRetweet.setImageResource(R.drawable.ic_retweet_downloaded);
         }
-        if(tweet.getInReplyToUserName() != null){
+        /*if(tweet.getInReplyToUserName() != null){
             holder.tvRetweetReplyInfo.setText("In reply to "+tweet.getInReplyToUserName());
             holder.tvRetweetReplyInfo.setVisibility(View.VISIBLE);
         }else{
             holder.tvRetweetReplyInfo.setVisibility(View.GONE);
-        }
+        }*/
         Media media = tweet.getMedia();
         Media extendedMedia = tweet.getExtendedMedia();
         if(media != null){
