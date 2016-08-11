@@ -56,7 +56,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(getActivity(), "Positive Action", Toast.LENGTH_SHORT).show();
-                ((TimelineActivity)getActivity()).postNewTweet(etTweet.getText().toString());
+                //((TimelineActivity)getActivity()).postNewTweet(etTweet.getText().toString());
                 dialog.dismiss();
             }
         });
