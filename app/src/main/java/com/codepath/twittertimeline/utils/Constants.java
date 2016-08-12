@@ -7,5 +7,5 @@ public interface Constants {
     String IMAGE_KEY = "photo";
     String VIDEO_KEY = "video";
 
-    int PAGE_SIZE = 100;
+    int PAGE_SIZE = 20;
 }

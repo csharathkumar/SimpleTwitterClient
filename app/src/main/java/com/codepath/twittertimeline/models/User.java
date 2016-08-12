@@ -14,6 +14,9 @@ public class User implements Parcelable {
     long uid;
     String screenName;
     String profileImageUrl;
+    String tagline;
+    int followersCount;
+    int friendsCount;
 
     public String getName() {
         return name;
@@ -47,6 +50,30 @@ public class User implements Parcelable {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(int followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public int getFriendsCount() {
+        return friendsCount;
+    }
+
+    public void setFriendsCount(int friendsCount) {
+        this.friendsCount = friendsCount;
+    }
+
     public static User fromJSONObject(JSONObject jsonObject){
         User user = new User();
         try{
@@ -54,6 +81,9 @@ public class User implements Parcelable {
             user.uid = jsonObject.getLong("id");
             user.screenName = jsonObject.getString("screen_name");
             user.profileImageUrl = jsonObject.getString("profile_image_url");
+            user.tagline = jsonObject.getString("description");
+            user.followersCount = jsonObject.getInt("followers_count");
+            user.friendsCount = jsonObject.getInt("friends_count");
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -71,6 +101,9 @@ public class User implements Parcelable {
         dest.writeLong(this.uid);
         dest.writeString(this.screenName);
         dest.writeString(this.profileImageUrl);
+        dest.writeString(this.tagline);
+        dest.writeInt(this.followersCount);
+        dest.writeInt(this.friendsCount);
     }
 
     public User() {
@@ -81,9 +114,12 @@ public class User implements Parcelable {
         this.uid = in.readLong();
         this.screenName = in.readString();
         this.profileImageUrl = in.readString();
+        this.tagline = in.readString();
+        this.followersCount = in.readInt();
+        this.friendsCount = in.readInt();
     }
 
-    public static final Creator<User> CREATOR = new Creator<User>() {
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);

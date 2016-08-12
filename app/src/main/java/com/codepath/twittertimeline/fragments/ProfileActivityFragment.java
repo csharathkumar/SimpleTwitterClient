@@ -1,9 +1,8 @@
 package com.codepath.twittertimeline.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
@@ -12,11 +11,9 @@ import com.codepath.twittertimeline.R;
 import com.codepath.twittertimeline.TwitterApplication;
 import com.codepath.twittertimeline.activities.ComposeActivity;
 import com.codepath.twittertimeline.activities.MediaActivity;
-import com.codepath.twittertimeline.activities.TimelineActivity;
 import com.codepath.twittertimeline.adapters.TweetsRecyclerAdapter;
 import com.codepath.twittertimeline.models.Tweet;
 import com.codepath.twittertimeline.utils.EndlessRecyclerViewScrollListener;
-import com.codepath.twittertimeline.utils.UiUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -27,10 +24,23 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * Created by Sharath on 8/10/16.
+ * A placeholder fragment containing a simple view.
  */
-public class MentionsTimelineFragment extends TweetsListFragment {
-    private static final String TAG = HomeTimelineFragment.class.getSimpleName();
+public class ProfileActivityFragment extends TweetsListFragment {
+
+    private static final String TAG = ProfileActivityFragment.class.getSimpleName();
+
+    public ProfileActivityFragment() {
+    }
+
+    public static ProfileActivityFragment newInstance(String screenName){
+        ProfileActivityFragment profileActivityFragment = new ProfileActivityFragment();
+        Bundle args = new Bundle();
+        args.putString("SCREEN_NAME",screenName);
+        profileActivityFragment.setArguments(args);
+        return profileActivityFragment;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         tweets = new ArrayList<>();
@@ -48,10 +58,10 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                         startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
                         break;
                     case R.id.actionFavorite:
-                        favoriteTweet(position, tweet);
+                        //favoriteTweet(position, tweet);
                         break;
                     case R.id.actionRetweet:
-                        retweetTweet(position,tweet);
+                        //retweetTweet(position,tweet);
                         break;
                     case R.id.videoView:
                     case R.id.ivImage:
@@ -84,72 +94,8 @@ public class MentionsTimelineFragment extends TweetsListFragment {
         populateTimeline(true,1);
     }
 
-    //creation lifecycle event
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        coordinatorLayout = ((TimelineActivity)getActivity()).getCoordinatorLayout();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-    }
-
-    private void favoriteTweet(final int position, Tweet tweet) {
-        boolean create = !tweet.isFavorited();
-        client.favoriteTweet(create,tweet.getUid(),new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                try {
-                    //JSONObject jsonObject = response.getJSONObject(0);
-                    Tweet tweetReturned = Tweet.fromJSON(response);
-                    tweetsRecyclerAdapter.replaceItemAtPosition(tweetReturned,position);
-                    UiUtils.showSnackBar(coordinatorLayout,"Favorited");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG,"Error while favoriting a tweet - "+errorResponse.toString());
-                UiUtils.showSnackBar(coordinatorLayout,getString(R.string.favorite_unsuccessful));
-                //Toast.makeText(TimelineActivity.this,"Favorite unsuccessful",Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void retweetTweet(final int position, Tweet tweet){
-        boolean create = !tweet.isRetweeted();
-        client.retweet(create,tweet.getUid(),new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                try {
-                    Tweet tweetReturned = Tweet.fromJSON(response);
-                    tweetsRecyclerAdapter.replaceItemAtPosition(tweetReturned,position);
-                    UiUtils.showSnackBar(coordinatorLayout,getString(R.string.retweeted));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG,"Error while favoriting a tweet - "+errorResponse.toString());
-                UiUtils.showSnackBar(coordinatorLayout,getString(R.string.retweet_unsuccessful));
-            }
-        });
-    }
-
     private void populateTimeline(final boolean initial, long id) {
-        client.getMentionsTimeline(initial,id,new JsonHttpResponseHandler(){
+        client.getUserTimeLine(null,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 String res = response.toString();
@@ -170,20 +116,6 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                 if(swipeRefreshLayout.isRefreshing()){
                     swipeRefreshLayout.setRefreshing(false);
                 }
-            }
-        });
-    }
-    public void postNewTweet(String status){
-        client.postNewTweet(status,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Tweet tweet = Tweet.fromJSON(response);
-                tweetsRecyclerAdapter.addItemAtPosition(tweet,0);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
     }

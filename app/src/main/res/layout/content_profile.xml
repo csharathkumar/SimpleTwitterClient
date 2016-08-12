@@ -1,0 +1,65 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:layout="@layout/fragment_profile">
+    <RelativeLayout android:id="@+id/rlHeader"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/ivProfile"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvScreenName"
+            android:paddingLeft="2dp"
+            tools:text="sharathc"
+            android:textColor="@android:color/secondary_text_light_nodisable"
+            android:layout_toRightOf="@+id/ivProfile"
+            android:layout_toEndOf="@+id/ivProfile"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bobby"
+            android:id="@+id/tvTagline"
+            android:layout_below="@+id/tvScreenName"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_toRightOf="@+id/ivProfile"
+            android:layout_toEndOf="@+id/ivProfile" />
+        <LinearLayout android:id="@+id/llFollowersInfo"
+            android:layout_below="@+id/ivProfile"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView android:id="@+id/tvFollowers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="150 followers"
+                />
+            <TextView android:id="@+id/tvFollowing"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="100 Following"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+    <FrameLayout android:id="@+id/fragment_container"
+        android:layout_below="@+id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</RelativeLayout>

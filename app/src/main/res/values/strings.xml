@@ -17,5 +17,7 @@
     <string name="favorited">Favorited</string>
     <string name="favorite_successful">Favorite unsuccessful</string>
     <string name="check_tweet_length">Please check the length of the tweet</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
