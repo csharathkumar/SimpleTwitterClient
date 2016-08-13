@@ -35,18 +35,19 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
     private Context mContext;
     private List<Tweet> mTweets;
     // Define listener member variable
-    private static OnItemClickListener listener;
+    private OnItemClickListener listener;
     // Define the listener interface
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
     }
     // Define the method that allows the parent activity or fragment to define the listener
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    /*public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
-    }
-    public TweetsRecyclerAdapter(Context context, List<Tweet>tweets){
+    }*/
+    public TweetsRecyclerAdapter(Context context, List<Tweet>tweets, OnItemClickListener clickListener){
         mContext = context;
         mTweets = tweets;
+        listener = clickListener;
     }
 
     private Context getContext() {
@@ -70,9 +71,11 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         holder.tvTimestamp.setText(UtilityMethods.getTimeDifference(tweet.getCreatedAt()));
         holder.tvBody.setText(tweet.getBody());
         holder.ivProfileImage.setImageResource(0);
+        holder.ivProfileImage.setTag(tweet.getUser().getScreenName());
         Picasso.with(mContext)
                 .load(tweet.getUser().getProfileImageUrl())
                 .into(holder.ivProfileImage);
+
         if(tweet.isFavorited()){
             holder.ivFavorite.setImageResource(R.drawable.ic_favorited);
         }else{
@@ -152,7 +155,7 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         return mTweets.size();
     }
 
-    public static class TweetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class TweetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvRetweetReplyInfo)
         TextView tvRetweetReplyInfo;
         @BindView(R.id.ivProfile)
@@ -191,6 +194,7 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
             ivRetweet.setOnClickListener(this);
             ivImage.setOnClickListener(this);
             playImageButton.setOnClickListener(this);
+            ivProfileImage.setOnClickListener(this);
         }
 
         @Override

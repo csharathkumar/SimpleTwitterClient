@@ -26,10 +26,10 @@ import cz.msebera.android.httpclient.Header;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ProfileActivityFragment extends TweetsListFragment {
+public class ProfileActivityFragment extends TweetsListFragment implements TweetsRecyclerAdapter.OnItemClickListener{
 
     private static final String TAG = ProfileActivityFragment.class.getSimpleName();
-
+    private String mScreenName;
     public ProfileActivityFragment() {
     }
 
@@ -42,40 +42,20 @@ public class ProfileActivityFragment extends TweetsListFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        tweets = new ArrayList<>();
-        tweetsRecyclerAdapter = new TweetsRecyclerAdapter(getActivity(),tweets);
-        rvTweets.setAdapter(tweetsRecyclerAdapter);
-        tweetsRecyclerAdapter.setOnItemClickListener(new TweetsRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                Tweet tweet = tweets.get(position);
-                switch(itemView.getId()){
-                    case R.id.actionReply:
-                        Intent intent = new Intent(getActivity(),ComposeActivity.class);
-                        intent.putExtra(ComposeActivity.IS_REPLY,true);
-                        intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
-                        startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
-                        break;
-                    case R.id.actionFavorite:
-                        //favoriteTweet(position, tweet);
-                        break;
-                    case R.id.actionRetweet:
-                        //retweetTweet(position,tweet);
-                        break;
-                    case R.id.videoView:
-                    case R.id.ivImage:
-                        Intent mediaIntent = new Intent(getActivity(), MediaActivity.class);
-                        mediaIntent.putExtra(MediaActivity.TWEET_TO_DISPLAY,tweet);
-                        mediaIntent.putExtra(MediaActivity.TWEET_POSITION,position);
-                        startActivityForResult(mediaIntent,MediaActivity.OPEN_MEDIA_ACTIVITY_REQUEST_CODE);
-                        break;
-                    default:
-                        //Toast.makeText(getApplicationContext(), tweet.getBody(),Toast.LENGTH_SHORT).show();
-                }
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            mScreenName = getArguments().getString("SCREEN_NAME");
+        }
+    }
 
-            }
-        });
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        tweets = new ArrayList<>();
+        tweetsRecyclerAdapter = new TweetsRecyclerAdapter(getActivity(),tweets,this);
+        rvTweets.setAdapter(tweetsRecyclerAdapter);
+
         rvTweets.setOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -95,7 +75,7 @@ public class ProfileActivityFragment extends TweetsListFragment {
     }
 
     private void populateTimeline(final boolean initial, long id) {
-        client.getUserTimeLine(null,new JsonHttpResponseHandler(){
+        client.getUserTimeLine(mScreenName,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 String res = response.toString();
@@ -118,5 +98,33 @@ public class ProfileActivityFragment extends TweetsListFragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onItemClick(View itemView, int position) {
+        Tweet tweet = tweets.get(position);
+        switch(itemView.getId()){
+            case R.id.actionReply:
+                Intent intent = new Intent(getActivity(),ComposeActivity.class);
+                intent.putExtra(ComposeActivity.IS_REPLY,true);
+                intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
+                startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                break;
+            case R.id.actionFavorite:
+                //favoriteTweet(position, tweet);
+                break;
+            case R.id.actionRetweet:
+                //retweetTweet(position,tweet);
+                break;
+            case R.id.videoView:
+            case R.id.ivImage:
+                Intent mediaIntent = new Intent(getActivity(), MediaActivity.class);
+                mediaIntent.putExtra(MediaActivity.TWEET_TO_DISPLAY,tweet);
+                mediaIntent.putExtra(MediaActivity.TWEET_POSITION,position);
+                startActivityForResult(mediaIntent,MediaActivity.OPEN_MEDIA_ACTIVITY_REQUEST_CODE);
+                break;
+            default:
+                //Toast.makeText(getApplicationContext(), tweet.getBody(),Toast.LENGTH_SHORT).show();
+        }
     }
 }

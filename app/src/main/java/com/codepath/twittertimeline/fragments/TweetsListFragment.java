@@ -1,6 +1,7 @@
 package com.codepath.twittertimeline.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,27 +16,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.codepath.twittertimeline.R;
-import com.codepath.twittertimeline.TwitterApplication;
 import com.codepath.twittertimeline.TwitterClient;
-import com.codepath.twittertimeline.activities.ComposeActivity;
-import com.codepath.twittertimeline.activities.MediaActivity;
+import com.codepath.twittertimeline.activities.ProfileActivity;
 import com.codepath.twittertimeline.activities.TimelineActivity;
 import com.codepath.twittertimeline.adapters.TweetsRecyclerAdapter;
 import com.codepath.twittertimeline.models.Tweet;
 import com.codepath.twittertimeline.utils.DividerItemDecoration;
-import com.codepath.twittertimeline.utils.EndlessRecyclerViewScrollListener;
-import com.codepath.twittertimeline.utils.UiUtils;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Sharath on 8/9/16.
@@ -80,6 +71,19 @@ public class TweetsListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 //        coordinatorLayout = ((TimelineActivity)getActivity()).getCoordinatorLayout();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if(context instanceof TimelineActivity){
+            coordinatorLayout = ((TimelineActivity)context).getCoordinatorLayout();
+            Log.d(TAG,"Coordinator Layout initialised");
+        }else if(context instanceof ProfileActivity){
+            coordinatorLayout = ((ProfileActivity)context).getCoordinatorLayout();
+            Log.d(TAG,"Coordinator Layout initialised from Profile Activity");
+        }
     }
 
     public CoordinatorLayout getCoordinatorLayout(){

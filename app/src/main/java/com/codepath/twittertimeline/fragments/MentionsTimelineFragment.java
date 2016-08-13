@@ -29,43 +29,14 @@ import cz.msebera.android.httpclient.Header;
 /**
  * Created by Sharath on 8/10/16.
  */
-public class MentionsTimelineFragment extends TweetsListFragment {
+public class MentionsTimelineFragment extends TweetsListFragment implements TweetsRecyclerAdapter.OnItemClickListener{
     private static final String TAG = HomeTimelineFragment.class.getSimpleName();
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         tweets = new ArrayList<>();
-        tweetsRecyclerAdapter = new TweetsRecyclerAdapter(getActivity(),tweets);
+        tweetsRecyclerAdapter = new TweetsRecyclerAdapter(getActivity(),tweets,this);
         rvTweets.setAdapter(tweetsRecyclerAdapter);
-        tweetsRecyclerAdapter.setOnItemClickListener(new TweetsRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                Tweet tweet = tweets.get(position);
-                switch(itemView.getId()){
-                    case R.id.actionReply:
-                        Intent intent = new Intent(getActivity(),ComposeActivity.class);
-                        intent.putExtra(ComposeActivity.IS_REPLY,true);
-                        intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
-                        startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
-                        break;
-                    case R.id.actionFavorite:
-                        favoriteTweet(position, tweet);
-                        break;
-                    case R.id.actionRetweet:
-                        retweetTweet(position,tweet);
-                        break;
-                    case R.id.videoView:
-                    case R.id.ivImage:
-                        Intent mediaIntent = new Intent(getActivity(), MediaActivity.class);
-                        mediaIntent.putExtra(MediaActivity.TWEET_TO_DISPLAY,tweet);
-                        mediaIntent.putExtra(MediaActivity.TWEET_POSITION,position);
-                        startActivityForResult(mediaIntent,MediaActivity.OPEN_MEDIA_ACTIVITY_REQUEST_CODE);
-                        break;
-                    default:
-                        //Toast.makeText(getApplicationContext(), tweet.getBody(),Toast.LENGTH_SHORT).show();
-                }
 
-            }
-        });
         rvTweets.setOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -186,5 +157,33 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
+    }
+
+    @Override
+    public void onItemClick(View itemView, int position) {
+        Tweet tweet = tweets.get(position);
+        switch(itemView.getId()){
+            case R.id.actionReply:
+                Intent intent = new Intent(getActivity(),ComposeActivity.class);
+                intent.putExtra(ComposeActivity.IS_REPLY,true);
+                intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
+                startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                break;
+            case R.id.actionFavorite:
+                favoriteTweet(position, tweet);
+                break;
+            case R.id.actionRetweet:
+                retweetTweet(position,tweet);
+                break;
+            case R.id.videoView:
+            case R.id.ivImage:
+                Intent mediaIntent = new Intent(getActivity(), MediaActivity.class);
+                mediaIntent.putExtra(MediaActivity.TWEET_TO_DISPLAY,tweet);
+                mediaIntent.putExtra(MediaActivity.TWEET_POSITION,position);
+                startActivityForResult(mediaIntent,MediaActivity.OPEN_MEDIA_ACTIVITY_REQUEST_CODE);
+                break;
+            default:
+                //Toast.makeText(getApplicationContext(), tweet.getBody(),Toast.LENGTH_SHORT).show();
+        }
     }
 }
