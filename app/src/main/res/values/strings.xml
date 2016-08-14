@@ -19,5 +19,7 @@
     <string name="check_tweet_length">Please check the length of the tweet</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="action_settings">Settings</string>
+    <string name="followers">%d Followers</string>
+    <string name="following">%d Following</string>
 
 </resources>

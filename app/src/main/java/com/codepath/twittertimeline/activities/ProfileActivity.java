@@ -1,6 +1,7 @@
 package com.codepath.twittertimeline.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -29,6 +30,8 @@ public class ProfileActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
+    @BindView(R.id.appbar)
+    AppBarLayout appBarLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     TwitterClient client;
@@ -43,17 +46,22 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         client = TwitterApplication.getRestClient();
-        client.getUserInfo(new JsonHttpResponseHandler(){
+        //Get screen name
+        final String screenName = getIntent().getStringExtra("SCREEN_NAME");
+        boolean current = false;
+        if(screenName == null){
+            current = true;
+        }
+        client.getUserInfo(current, screenName, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 user = User.fromJSONObject(response);
                 //My current user account information
                 getSupportActionBar().setTitle(user.getScreenName());
                 populateProfileHeader(user);
+                setTitle(user);
             }
         });
-        //Get screen name
-        String screenName = getIntent().getStringExtra("SCREEN_NAME");
         if(savedInstanceState == null){
             //Create user timeline fragment
             ProfileActivityFragment profileActivityFragment = ProfileActivityFragment.newInstance(screenName);
@@ -62,9 +70,31 @@ public class ProfileActivity extends AppCompatActivity {
             ft.replace(R.id.fragment_container,profileActivityFragment);
             ft.commit();
         }
-        collapsingToolbarLayout.setTitle(screenName);
+        collapsingToolbarLayout.setTitle(" ");
     }
 
+    private void setTitle(final User user){
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    if(user != null){
+                        collapsingToolbarLayout.setTitle(user.getScreenName());
+                        isShow = true;
+                    }
+                } else if(isShow) {
+                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    isShow = false;
+                }
+            }
+        });
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
@@ -74,17 +104,21 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     void populateProfileHeader(User user){
+        TextView tvFullname = (TextView) findViewById(R.id.tvFullName);
         TextView tvScreenName = (TextView) findViewById(R.id.tvScreenName);
         TextView tvTagline = (TextView) findViewById(R.id.tvTagline);
         ImageView ivProfile = (ImageView) findViewById(R.id.ivProfile);
+        ImageView ivBackdrop = (ImageView) findViewById(R.id.backdrop);
         TextView tvFollowers = (TextView) findViewById(R.id.tvFollowers);
         TextView tvFollowing = (TextView) findViewById(R.id.tvFollowing);
 
-        tvScreenName.setText(user.getName());
+        tvFullname.setText(user.getName());
+        tvScreenName.setText(String.format("@%s", user.getScreenName()));
         tvTagline.setText(user.getTagline());
-        tvFollowers.setText(user.getFollowersCount()+" Followers");
-        tvFollowing.setText(user.getFriendsCount()+" Following");
+        tvFollowers.setText(String.format(getString(R.string.followers), user.getFollowersCount()));
+        tvFollowing.setText(String.format(getString(R.string.following), user.getFriendsCount()));
         Picasso.with(this).load(user.getProfileImageUrl()).into(ivProfile);
+        Picasso.with(this).load(user.getProfileBackdropImageUrl()).into(ivBackdrop);
     }
 
     public CoordinatorLayout getCoordinatorLayout() {

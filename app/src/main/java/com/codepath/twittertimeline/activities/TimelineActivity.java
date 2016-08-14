@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.codepath.twittertimeline.R;
+import com.codepath.twittertimeline.fragments.ComposeTweetDialogFragment;
 import com.codepath.twittertimeline.fragments.HomeTimelineFragment;
 import com.codepath.twittertimeline.fragments.MentionsTimelineFragment;
 
@@ -52,10 +53,10 @@ public class TimelineActivity extends AppCompatActivity {
         fabCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance();
-                composeTweetDialogFragment.show(getSupportFragmentManager(),"Compose");*/
-                Intent intent = new Intent(TimelineActivity.this, ComposeActivity.class);
-                startActivityForResult(intent,ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);
+                ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance();
+                composeTweetDialogFragment.show(getSupportFragmentManager(),"Compose");
+                /*Intent intent = new Intent(TimelineActivity.this, ComposeActivity.class);
+                startActivityForResult(intent,ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);*/
             }
         });
         viewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(),TimelineActivity.this));

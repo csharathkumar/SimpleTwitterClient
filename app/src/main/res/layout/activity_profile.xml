@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/detail_backdrop_height"
+        android:layout_height="@dimen/profile_backdrop_height"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true">
 
@@ -34,54 +34,88 @@
             <RelativeLayout android:id="@+id/rlHeader"
                 android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
-                android:layout_height="150dp">
-                <ImageView
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:id="@+id/ivProfile"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvScreenName"
-                    android:paddingLeft="2dp"
-                    tools:text="sharathc"
-                    android:textColor="@android:color/secondary_text_light_nodisable"
-                    android:layout_toRightOf="@+id/ivProfile"
-                    android:layout_toEndOf="@+id/ivProfile"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bobby"
-                    android:id="@+id/tvTagline"
-                    android:layout_below="@+id/tvScreenName"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:layout_toRightOf="@+id/ivProfile"
-                    android:layout_toEndOf="@+id/ivProfile" />
-                <LinearLayout android:id="@+id/llFollowersInfo"
-                    android:layout_below="@+id/ivProfile"
-                    android:orientation="horizontal"
+                android:layout_height="match_parent">
+                <FrameLayout android:id="@+id/imagesFL"
+                    xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <TextView android:id="@+id/tvFollowers"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="150 followers"
+                    <ImageView
+                        android:id="@+id/backdrop"
+                        android:src="@android:drawable/screen_background_dark_transparent"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:scaleType="centerCrop" />
+                    <ImageView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:id="@+id/ivProfile"
+                        android:src="@android:drawable/screen_background_light"
+                        android:layout_gravity="bottom"
+                        android:layout_marginTop="75dp"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
                         />
-                    <TextView android:id="@+id/tvFollowing"
-                        android:layout_width="0dp"
+                    </FrameLayout>
+                <LinearLayout android:id="@+id/userInfo"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/imagesFL"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="100 Following"
+                        android:id="@+id/tvFullName"
+                        android:paddingLeft="2dp"
+                        tools:text="Sharath Kumar C"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:textColor="@color/white"
                         />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tvScreenName"
+                        android:paddingLeft="2dp"
+                        tools:text="\@sharathc"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:textColor="@color/white"
+
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Interested in technology, sports and movies"
+                        android:id="@+id/tvTagline"
+                        android:layout_marginTop="10dp"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textColor="@color/white"
+                        />
+                    <LinearLayout android:id="@+id/llFollowersInfo"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:layout_height="wrap_content">
+                        <TextView android:id="@+id/tvFollowing"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:textColor="@color/white"
+                            android:text="100 Following"
+                            />
+                        <TextView android:id="@+id/tvFollowers"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:textColor="@color/white"
+                            android:text="150 followers"
+                            />
+                    </LinearLayout>
                 </LinearLayout>
+
             </RelativeLayout>
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -97,7 +131,8 @@
     <FrameLayout android:id="@+id/fragment_container"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"/>
 </android.support.design.widget.CoordinatorLayout>
 <!--<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -17,6 +17,9 @@ public class User implements Parcelable {
     String tagline;
     int followersCount;
     int friendsCount;
+    String profileBackdropImageUrl;
+    long totalTweets;
+    boolean isVerified;
 
     public String getName() {
         return name;
@@ -70,6 +73,30 @@ public class User implements Parcelable {
         return friendsCount;
     }
 
+    public String getProfileBackdropImageUrl() {
+        return profileBackdropImageUrl;
+    }
+
+    public void setProfileBackdropImageUrl(String profileBackdropImageUrl) {
+        this.profileBackdropImageUrl = profileBackdropImageUrl;
+    }
+
+    public long getTotalTweets() {
+        return totalTweets;
+    }
+
+    public void setTotalTweets(long totalTweets) {
+        this.totalTweets = totalTweets;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
     public void setFriendsCount(int friendsCount) {
         this.friendsCount = friendsCount;
     }
@@ -84,11 +111,15 @@ public class User implements Parcelable {
             user.tagline = jsonObject.getString("description");
             user.followersCount = jsonObject.getInt("followers_count");
             user.friendsCount = jsonObject.getInt("friends_count");
+            user.profileBackdropImageUrl = jsonObject.getString("profile_background_image_url_https");
+            user.totalTweets = jsonObject.getLong("statuses_count");
+            user.isVerified = jsonObject.getBoolean("verified");
         }catch(JSONException e){
             e.printStackTrace();
         }
         return user;
     }
+
 
     @Override
     public int describeContents() {
@@ -104,6 +135,9 @@ public class User implements Parcelable {
         dest.writeString(this.tagline);
         dest.writeInt(this.followersCount);
         dest.writeInt(this.friendsCount);
+        dest.writeString(this.profileBackdropImageUrl);
+        dest.writeLong(this.totalTweets);
+        dest.writeByte(this.isVerified ? (byte) 1 : (byte) 0);
     }
 
     public User() {
@@ -117,6 +151,9 @@ public class User implements Parcelable {
         this.tagline = in.readString();
         this.followersCount = in.readInt();
         this.friendsCount = in.readInt();
+        this.profileBackdropImageUrl = in.readString();
+        this.totalTweets = in.readLong();
+        this.isVerified = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

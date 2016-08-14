@@ -14,6 +14,7 @@ import com.codepath.twittertimeline.activities.MediaActivity;
 import com.codepath.twittertimeline.adapters.TweetsRecyclerAdapter;
 import com.codepath.twittertimeline.models.Tweet;
 import com.codepath.twittertimeline.utils.EndlessRecyclerViewScrollListener;
+import com.codepath.twittertimeline.utils.UiUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -99,7 +100,51 @@ public class ProfileActivityFragment extends TweetsListFragment implements Tweet
             }
         });
     }
+    private void favoriteTweet(final int position, Tweet tweet) {
+        boolean create = !tweet.isFavorited();
+        client.favoriteTweet(create,tweet.getUid(),new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    //JSONObject jsonObject = response.getJSONObject(0);
+                    Tweet tweetReturned = Tweet.fromJSON(response);
+                    tweetsRecyclerAdapter.replaceItemAtPosition(tweetReturned,position);
+                    UiUtils.showSnackBar(coordinatorLayout,"Favorited");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG,"Error while favoriting a tweet - "+errorResponse.toString());
+                UiUtils.showSnackBar(coordinatorLayout,getString(R.string.favorite_unsuccessful));
+                //Toast.makeText(TimelineActivity.this,"Favorite unsuccessful",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void retweetTweet(final int position, Tweet tweet){
+        boolean create = !tweet.isRetweeted();
+        client.retweet(create,tweet.getUid(),new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    Tweet tweetReturned = Tweet.fromJSON(response);
+                    tweetsRecyclerAdapter.replaceItemAtPosition(tweetReturned,position);
+                    UiUtils.showSnackBar(coordinatorLayout,getString(R.string.retweeted));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG,"Error while favoriting a tweet - "+errorResponse.toString());
+                UiUtils.showSnackBar(coordinatorLayout,getString(R.string.retweet_unsuccessful));
+            }
+        });
+    }
     @Override
     public void onItemClick(View itemView, int position) {
         Tweet tweet = tweets.get(position);
@@ -111,10 +156,10 @@ public class ProfileActivityFragment extends TweetsListFragment implements Tweet
                 startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
                 break;
             case R.id.actionFavorite:
-                //favoriteTweet(position, tweet);
+                favoriteTweet(position, tweet);
                 break;
             case R.id.actionRetweet:
-                //retweetTweet(position,tweet);
+                retweetTweet(position,tweet);
                 break;
             case R.id.videoView:
             case R.id.ivImage:
