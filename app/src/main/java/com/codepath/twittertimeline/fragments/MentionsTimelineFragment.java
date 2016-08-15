@@ -1,9 +1,11 @@
 package com.codepath.twittertimeline.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,7 @@ import com.codepath.twittertimeline.R;
 import com.codepath.twittertimeline.TwitterApplication;
 import com.codepath.twittertimeline.activities.ComposeActivity;
 import com.codepath.twittertimeline.activities.MediaActivity;
+import com.codepath.twittertimeline.activities.ProfileActivity;
 import com.codepath.twittertimeline.activities.TimelineActivity;
 import com.codepath.twittertimeline.adapters.TweetsRecyclerAdapter;
 import com.codepath.twittertimeline.models.Tweet;
@@ -67,10 +70,27 @@ public class MentionsTimelineFragment extends TweetsListFragment implements Twee
         super.onActivityCreated(savedInstanceState);
         coordinatorLayout = ((TimelineActivity)getActivity()).getCoordinatorLayout();
     }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        if(requestCode == ComposeActivity.COMPOSE_TWEET_REQUEST_CODE || requestCode == ComposeActivity.REPLY_TWEET_REQUEST_CODE){
+            if(resultCode == Activity.RESULT_OK){
+                if(data != null){
+                    Tweet tweet = data.getParcelableExtra(ComposeActivity.TWEET_OBJECT);
+                    tweetsRecyclerAdapter.addItemAtPosition(tweet,0);
+                    rvTweets.scrollToPosition(0);
+                }
+            }
+        }
     }
 
     private void favoriteTweet(final int position, Tweet tweet) {
@@ -144,30 +164,15 @@ public class MentionsTimelineFragment extends TweetsListFragment implements Twee
             }
         });
     }
-    public void postNewTweet(String status){
-        client.postNewTweet(status,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Tweet tweet = Tweet.fromJSON(response);
-                tweetsRecyclerAdapter.addItemAtPosition(tweet,0);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
-    }
 
     @Override
     public void onItemClick(View itemView, int position) {
         Tweet tweet = tweets.get(position);
         switch(itemView.getId()){
             case R.id.actionReply:
-                Intent intent = new Intent(getActivity(),ComposeActivity.class);
-                intent.putExtra(ComposeActivity.IS_REPLY,true);
-                intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
-                startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance(tweet);
+                composeTweetDialogFragment.setTargetFragment(MentionsTimelineFragment.this, ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                composeTweetDialogFragment.show(getActivity().getSupportFragmentManager(),"Reply");
                 break;
             case R.id.actionFavorite:
                 favoriteTweet(position, tweet);
@@ -181,6 +186,12 @@ public class MentionsTimelineFragment extends TweetsListFragment implements Twee
                 mediaIntent.putExtra(MediaActivity.TWEET_TO_DISPLAY,tweet);
                 mediaIntent.putExtra(MediaActivity.TWEET_POSITION,position);
                 startActivityForResult(mediaIntent,MediaActivity.OPEN_MEDIA_ACTIVITY_REQUEST_CODE);
+                break;
+            case R.id.ivProfile:
+                Intent profileIntent = new Intent(getActivity(), ProfileActivity.class);
+                String screenName = String.valueOf(itemView.getTag());
+                profileIntent.putExtra("SCREEN_NAME",screenName);
+                startActivity(profileIntent);
                 break;
             default:
                 //Toast.makeText(getApplicationContext(), tweet.getBody(),Toast.LENGTH_SHORT).show();

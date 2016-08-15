@@ -27,6 +27,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 /**
  * Created by Sharath on 8/3/16.
@@ -74,6 +76,9 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         holder.ivProfileImage.setTag(tweet.getUser().getScreenName());
         Picasso.with(mContext)
                 .load(tweet.getUser().getProfileImageUrl())
+                .transform(new CropCircleTransformation())
+                .resize(50, 50)
+                .centerCrop()
                 .into(holder.ivProfileImage);
 
         if(tweet.isFavorited()){

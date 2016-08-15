@@ -103,11 +103,7 @@ public class ComposeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String tweet = etTweet.getText().toString();
                 if(!tweet.isEmpty() && tweet.length() <= 140){
-                    if(isReply){
-                        postAReply(tweet);
-                    }else{
-                        postNewTweet(tweet);
-                    }
+                    postNewTweet(tweet);
                 }else{
                     UiUtils.showSnackBar(coordinatorLayout,getString(R.string.check_tweet_length));
                 }
@@ -125,24 +121,11 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void postNewTweet(String tweet){
-        client.postNewTweet(tweet,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Tweet tweet = Tweet.fromJSON(response);
-                Intent data = new Intent();
-                data.putExtra(TWEET_OBJECT,tweet);
-                setResult(Activity.RESULT_OK,data);
-                finish();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
-    }
-    private void postAReply(String tweet){
-        client.postNewReply(mInitialTweet.getUid(),tweet,new JsonHttpResponseHandler(){
+        Long inReplyToTweetId = null;
+        if(mInitialTweet != null){
+            inReplyToTweetId = mInitialTweet.getUid();
+        }
+        client.postNewTweet(tweet,inReplyToTweetId,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Tweet tweet = Tweet.fromJSON(response);

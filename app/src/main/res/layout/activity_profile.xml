@@ -83,7 +83,7 @@
                         android:textColor="@color/white"
 
                         />
-                    <TextView
+                    <com.codepath.twittertimeline.utils.LinkifiedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Interested in technology, sports and movies"

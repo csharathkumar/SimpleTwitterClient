@@ -5,8 +5,10 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +18,8 @@ import com.codepath.twittertimeline.TwitterApplication;
 import com.codepath.twittertimeline.TwitterClient;
 import com.codepath.twittertimeline.fragments.ProfileActivityFragment;
 import com.codepath.twittertimeline.models.User;
+import com.codepath.twittertimeline.prefs.SharedPreferenceUtils;
+import com.codepath.twittertimeline.utils.LinkifiedTextView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
@@ -24,8 +28,10 @@ import org.json.JSONObject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class ProfileActivity extends AppCompatActivity {
+    private static final String TAG = ProfileActivity.class.getSimpleName();
     @BindView(R.id.coordinatorLayout)
     CoordinatorLayout coordinatorLayout;
     @BindView(R.id.collapsing_toolbar)
@@ -49,19 +55,27 @@ public class ProfileActivity extends AppCompatActivity {
         //Get screen name
         final String screenName = getIntent().getStringExtra("SCREEN_NAME");
         boolean current = false;
+        boolean fetchInfo = true;
         if(screenName == null){
             current = true;
-        }
-        client.getUserInfo(current, screenName, new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                user = User.fromJSONObject(response);
-                //My current user account information
-                getSupportActionBar().setTitle(user.getScreenName());
-                populateProfileHeader(user);
-                setTitle(user);
+            if(SharedPreferenceUtils.hasTotalInfoAboutCurrentUser(ProfileActivity.this)){
+               fetchInfo = false;
             }
-        });
+        }
+
+        if(fetchInfo){
+            client.getUserInfo(current, screenName, new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    user = User.fromJSONObject(response);
+                    setUserInfo(user);
+                }
+            });
+        }else{
+            user = SharedPreferenceUtils.getUserInfoFromPreferences(this);
+            setUserInfo(user);
+        }
+
         if(savedInstanceState == null){
             //Create user timeline fragment
             ProfileActivityFragment profileActivityFragment = ProfileActivityFragment.newInstance(screenName);
@@ -72,7 +86,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
         collapsingToolbarLayout.setTitle(" ");
     }
-
+    private void setUserInfo(User user){
+        populateProfileHeader(user);
+        setTitle(user);
+    }
     private void setTitle(final User user){
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
@@ -106,19 +123,28 @@ public class ProfileActivity extends AppCompatActivity {
     void populateProfileHeader(User user){
         TextView tvFullname = (TextView) findViewById(R.id.tvFullName);
         TextView tvScreenName = (TextView) findViewById(R.id.tvScreenName);
-        TextView tvTagline = (TextView) findViewById(R.id.tvTagline);
+        LinkifiedTextView tvTagline = (LinkifiedTextView) findViewById(R.id.tvTagline);
         ImageView ivProfile = (ImageView) findViewById(R.id.ivProfile);
         ImageView ivBackdrop = (ImageView) findViewById(R.id.backdrop);
         TextView tvFollowers = (TextView) findViewById(R.id.tvFollowers);
         TextView tvFollowing = (TextView) findViewById(R.id.tvFollowing);
 
-        tvFullname.setText(user.getName());
+        if(user.isVerified()){
+            tvFullname.setCompoundDrawablePadding(10);
+            tvFullname.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_verified,0);
+            tvFullname.setText(user.getName());
+        }else{
+            tvFullname.setText(user.getName());
+        }
+
         tvScreenName.setText(String.format("@%s", user.getScreenName()));
         tvTagline.setText(user.getTagline());
         tvFollowers.setText(String.format(getString(R.string.followers), user.getFollowersCount()));
         tvFollowing.setText(String.format(getString(R.string.following), user.getFriendsCount()));
-        Picasso.with(this).load(user.getProfileImageUrl()).into(ivProfile);
+        Picasso.with(this).load(user.getProfileImageUrl())
+                .into(ivProfile);
         Picasso.with(this).load(user.getProfileBackdropImageUrl()).into(ivBackdrop);
+        Log.d(TAG,"Profile backdrop url is - "+user.getProfileBackdropImageUrl());
     }
 
     public CoordinatorLayout getCoordinatorLayout() {

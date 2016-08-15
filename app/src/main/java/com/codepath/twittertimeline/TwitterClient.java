@@ -77,11 +77,14 @@ public class TwitterClient extends OAuthBaseClient {
 
 	//Post a tweet
 	//https://api.twitter.com/1.1/statuses/update.json
-	public void postNewTweet(String status, AsyncHttpResponseHandler handler){
+	public void postNewTweet(String status, Long inReplyToTweetId, AsyncHttpResponseHandler handler){
 		String apiUrl = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();
 		try {
 			params.put("status", status);
+			if(inReplyToTweetId != null){
+				params.put("in_reply_to_status_id",inReplyToTweetId);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -145,7 +148,6 @@ public class TwitterClient extends OAuthBaseClient {
 		RequestParams params = new RequestParams();
 		if(current){
 			apiUrl = getApiUrl("account/verify_credentials.json");
-
 		}else{
 			apiUrl = getApiUrl("users/show.json");
 			params.put("screen_name",screenName);

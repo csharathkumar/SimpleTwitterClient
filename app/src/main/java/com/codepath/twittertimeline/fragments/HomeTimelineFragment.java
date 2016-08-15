@@ -1,15 +1,20 @@
 package com.codepath.twittertimeline.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -43,6 +48,7 @@ import cz.msebera.android.httpclient.Header;
 public class HomeTimelineFragment extends TweetsListFragment implements TweetsRecyclerAdapter.OnItemClickListener {
 
     private static final String TAG = HomeTimelineFragment.class.getSimpleName();
+    private FloatingActionButton fabCompose;
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         tweets = new ArrayList<>();
@@ -71,13 +77,58 @@ public class HomeTimelineFragment extends TweetsListFragment implements TweetsRe
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         coordinatorLayout = ((TimelineActivity)getActivity()).getCoordinatorLayout();
+        if(fabCompose != null){
+            fabCompose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance(null);
+                    composeTweetDialogFragment.setTargetFragment(HomeTimelineFragment.this, ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);
+                    composeTweetDialogFragment.show(getActivity().getSupportFragmentManager(),"Compose");
+                }
+            });
+        }
+    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if(context instanceof TimelineActivity){
+            fabCompose = ((TimelineActivity)context).getFabCompose();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_timeline, menu);
+
+        MenuItem compose = menu.findItem(R.id.compose);
+        compose.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance(null);
+                composeTweetDialogFragment.setTargetFragment(HomeTimelineFragment.this, ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);
+                composeTweetDialogFragment.show(getActivity().getSupportFragmentManager(),"Compose");
+                return true;
+            }
+        });
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -173,30 +224,14 @@ public class HomeTimelineFragment extends TweetsListFragment implements TweetsRe
             }
         });
     }
-    public void postNewTweet(String status){
-        client.postNewTweet(status,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Tweet tweet = Tweet.fromJSON(response);
-                tweetsRecyclerAdapter.addItemAtPosition(tweet,0);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
-    }
-
     @Override
     public void onItemClick(View itemView, int position) {
         Tweet tweet = tweets.get(position);
         switch(itemView.getId()){
             case R.id.actionReply:
-                Intent intent = new Intent(getActivity(),ComposeActivity.class);
-                intent.putExtra(ComposeActivity.IS_REPLY,true);
-                intent.putExtra(ComposeActivity.BASE_TWEET_OBJECT,tweet);
-                startActivityForResult(intent,ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance(tweet);
+                composeTweetDialogFragment.setTargetFragment(HomeTimelineFragment.this, ComposeActivity.REPLY_TWEET_REQUEST_CODE);
+                composeTweetDialogFragment.show(getActivity().getSupportFragmentManager(),"Reply");
                 break;
             case R.id.actionFavorite:
                 favoriteTweet(position, tweet);

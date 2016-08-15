@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,12 +24,22 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.codepath.twittertimeline.R;
+import com.codepath.twittertimeline.TwitterApplication;
+import com.codepath.twittertimeline.TwitterClient;
 import com.codepath.twittertimeline.fragments.ComposeTweetDialogFragment;
 import com.codepath.twittertimeline.fragments.HomeTimelineFragment;
 import com.codepath.twittertimeline.fragments.MentionsTimelineFragment;
+import com.codepath.twittertimeline.models.User;
+import com.codepath.twittertimeline.prefs.SharedPreferenceUtils;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 public class TimelineActivity extends AppCompatActivity {
     private static final String TAG = TimelineActivity.class.getSimpleName();
@@ -41,37 +52,63 @@ public class TimelineActivity extends AppCompatActivity {
     ViewPager viewPager;
     @BindView(R.id.fab)
     FloatingActionButton fabCompose;
-
+    TwitterClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
         ButterKnife.bind(this);
+        client = TwitterApplication.getRestClient();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        viewPager.setAdapter(new TweetsFragmentPagerAdapter(getSupportFragmentManager(),TimelineActivity.this));
+        tabLayout.setupWithViewPager(viewPager);
 
-        fabCompose.setOnClickListener(new View.OnClickListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View v) {
-                ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance();
-                composeTweetDialogFragment.show(getSupportFragmentManager(),"Compose");
-                /*Intent intent = new Intent(TimelineActivity.this, ComposeActivity.class);
-                startActivityForResult(intent,ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);*/
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position == 0){
+                    fabCompose.setVisibility(View.VISIBLE);
+                }else{
+                    fabCompose.setVisibility(View.GONE);
+                }
+                //DrawableCompat.setTint(tabLayout.getTabAt(position).getIcon(), ContextCompat.getColor(TimelineActivity.this, R.color.colorAccent));
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
-        viewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(),TimelineActivity.this));
-        tabLayout.setupWithViewPager(viewPager);
+        //fetch current user info and store it in shared preferences
+        if(!SharedPreferenceUtils.hasTotalInfoAboutCurrentUser(this)){
+            client.getUserInfo(true, "", new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    User user = User.fromJSONObject(response);
+                    SharedPreferenceUtils.storeUserInformation(TimelineActivity.this,user);
+                }
+            });
+        }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_timeline,menu);
-        MenuItem compose = menu.findItem(R.id.compose);
-        compose.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem profile = menu.findItem(R.id.profile);
+        profile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(TimelineActivity.this, ComposeActivity.class);
-                startActivityForResult(intent,ComposeActivity.COMPOSE_TWEET_REQUEST_CODE);
+                //Launch the profile view
+                Intent intent = new Intent(TimelineActivity.this,ProfileActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
@@ -81,20 +118,21 @@ public class TimelineActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        super.onActivityResult(requestCode,resultCode,data);
     }
 
     public CoordinatorLayout getCoordinatorLayout(){
         return coordinatorLayout;
     }
 
+    public FloatingActionButton getFabCompose() {
+        return fabCompose;
+    }
 
     public void onProfileView(MenuItem item) {
-        //Launch the profile view
-        Intent intent = new Intent(this,ProfileActivity.class);
-        startActivity(intent);
+
     }
-    public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
+    public class TweetsFragmentPagerAdapter extends FragmentPagerAdapter {
         final int PAGE_COUNT = 2;
         private String tabTitles[] = new String[] { "Timeline", "Mentions"};
         private int[] tabIcons = {
@@ -103,7 +141,7 @@ public class TimelineActivity extends AppCompatActivity {
         };
         private Context context;
 
-        public SampleFragmentPagerAdapter(FragmentManager fm, Context context) {
+        public TweetsFragmentPagerAdapter(FragmentManager fm, Context context) {
             super(fm);
             this.context = context;
         }
