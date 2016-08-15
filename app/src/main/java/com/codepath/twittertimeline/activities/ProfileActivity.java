@@ -1,5 +1,6 @@
 package com.codepath.twittertimeline.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -10,12 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codepath.twittertimeline.R;
 import com.codepath.twittertimeline.TwitterApplication;
 import com.codepath.twittertimeline.TwitterClient;
+import com.codepath.twittertimeline.fragments.FollowersActivityFragment;
 import com.codepath.twittertimeline.fragments.ProfileActivityFragment;
 import com.codepath.twittertimeline.models.User;
 import com.codepath.twittertimeline.prefs.SharedPreferenceUtils;
@@ -141,6 +144,19 @@ public class ProfileActivity extends AppCompatActivity {
         tvTagline.setText(user.getTagline());
         tvFollowers.setText(String.format(getString(R.string.followers), user.getFollowersCount()));
         tvFollowing.setText(String.format(getString(R.string.following), user.getFriendsCount()));
+        tvFollowers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFollowersList(true);
+            }
+        });
+        tvFollowing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFollowersList(false);
+            }
+        });
+
         Picasso.with(this).load(user.getProfileImageUrl())
                 .into(ivProfile);
         Picasso.with(this).load(user.getProfileBackdropImageUrl()).into(ivBackdrop);
@@ -149,5 +165,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
+    }
+
+    public void openFollowersList(boolean isFollowers){
+        Intent intent = new Intent(ProfileActivity.this,FollowersActivity.class);
+        intent.putExtra(FollowersActivityFragment.IS_FOLLOWERS,isFollowers);
+        intent.putExtra(FollowersActivityFragment.SCREEN_NAME,user.getScreenName());
+        startActivity(intent);
     }
 }

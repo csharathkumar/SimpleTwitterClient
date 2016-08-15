@@ -24,5 +24,6 @@
     <string name="in_reply_to">In reply to %s</string>
     <string name="no_internet">No Internet Available</string>
     <string name="tweet_hint">What\'s happening</string>
+    <string name="title_activity_followers">FollowersActivity</string>
 
 </resources>

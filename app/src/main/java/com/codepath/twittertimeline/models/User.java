@@ -3,8 +3,12 @@ package com.codepath.twittertimeline.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sharath on 8/2/16.
@@ -120,6 +124,17 @@ public class User implements Parcelable {
         return user;
     }
 
+    public static List<User> fromJSONArray(JSONArray jsonArray){
+        List<User> users = new ArrayList<>();
+        for(int i=0;i<jsonArray.length();i++){
+            try {
+                users.add(fromJSONObject(jsonArray.getJSONObject(i)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return users;
+    }
 
     @Override
     public int describeContents() {

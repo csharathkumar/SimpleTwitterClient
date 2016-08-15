@@ -77,8 +77,7 @@ public class TweetsRecyclerAdapter extends RecyclerView.Adapter<TweetsRecyclerAd
         Picasso.with(mContext)
                 .load(tweet.getUser().getProfileImageUrl())
                 .transform(new CropCircleTransformation())
-                .resize(50, 50)
-                .centerCrop()
+                .fit().centerCrop()
                 .into(holder.ivProfileImage);
 
         if(tweet.isFavorited()){
