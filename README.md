@@ -25,7 +25,6 @@ Completed advanced user stories:
                  User can take favorite (and unfavorite) or retweet actions on a tweet (1 point)
  * [x] Optional: Improve the user interface and theme the app to feel "twitter branded" 
  * [x] Optional: User can select "reply" from detail view to respond to a tweet.
- * [x] Optional: Improve the user interface and theme the app to feel "twitter branded".
  * [x] Optional: Compose activity is replaced with a modal overlay. 
  * [x] Optional: Use Parcelable instead of Serializable using the popular Parceler library. .
  * [x] Optional: Apply the popular Butterknife annotation library to reduce view boilerplate.
